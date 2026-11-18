@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.0
+
+      - name: Build release binaries
+        run: |
+          mkdir -p dist
+          for target in aarch64-macos x86_64-macos aarch64-linux-musl x86_64-linux-musl; do
+            zig build -Doptimize=ReleaseFast -Dtarget="$target" --prefix "out-$target"
+            tar -C "out-$target/bin" -czf "dist/agy-statusline-${target}.tar.gz" statusline
+          done
+          (cd dist && sha256sum *.tar.gz > checksums.txt)
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
