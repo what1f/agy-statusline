@@ -26,7 +26,13 @@ jobs:
             zig build -Doptimize=ReleaseFast -Dtarget="$target" --prefix "out-$target"
             tar -C "out-$target/bin" -czf "dist/agy-statusline-${target}.tar.gz" statusline
           done
-          (cd dist && sha256sum *.tar.gz > checksums.txt)
+          for pair in "x86_64-windows-gnu:x86_64-windows" "aarch64-windows-gnu:aarch64-windows"; do
+            zig_target="${pair%%:*}"
+            dist_name="${pair#*:}"
+            zig build -Doptimize=ReleaseFast -Dtarget="$zig_target" --prefix "out-$dist_name"
+            (cd "out-$dist_name/bin" && zip -q "../../dist/agy-statusline-${dist_name}.zip" statusline.exe)
+          done
+          (cd dist && sha256sum *.tar.gz *.zip > checksums.txt)
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

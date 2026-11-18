@@ -26,11 +26,19 @@ A fast, zero-dependency native status line for [Antigravity CLI](https://antigra
 
 Requires a [Nerd Font](https://www.nerdfonts.com/) and optional Git.
 
+**macOS / Linux:**
+
 ```sh
 curl -fsSL https://raw.githubusercontent.com/what1f/agy-statusline/main/install.sh | sh
 ```
 
-The installer downloads the prebuilt binary to `~/.gemini/antigravity-cli/statusline` and updates `~/.gemini/antigravity-cli/settings.json` (prompting before overwriting an existing `statusLine` configuration; pass `-s -- --yes` to overwrite non-interactively).
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/what1f/agy-statusline/main/install.ps1 | iex
+```
+
+The installer downloads the prebuilt binary to `~/.gemini/antigravity-cli/` and updates `settings.json` (prompting before overwriting an existing `statusLine` configuration; pass `-s -- --yes` on macOS/Linux or set `$env:AGY_STATUSLINE_YES=1` on Windows to overwrite non-interactively).
 
 <details>
 <summary>Build from source (requires Zig 0.17.0)</summary>
@@ -38,7 +46,8 @@ The installer downloads the prebuilt binary to `~/.gemini/antigravity-cli/status
 ```sh
 git clone https://github.com/what1f/agy-statusline.git
 cd agy-statusline
-./install.sh --from-source
+./install.sh --from-source      # macOS / Linux
+# .\install.ps1 -FromSource     # Windows (PowerShell)
 ```
 
 Or activate manually inside Antigravity CLI:

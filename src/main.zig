@@ -47,10 +47,14 @@ fn buildLine(io: Io, allocator: Allocator, out: *Writer, data: Value) !void {
 
     const cwd = json.orString(json.get(json.get(data, "workspace"), "current_dir"), json.string(json.get(data, "cwd")));
     if (cwd.len > 0) {
-        const norm = try std.fs.path.resolveAllocPosix(allocator, &.{cwd});
-        var name = std.fs.path.basenamePosix(norm);
-        if (std.mem.eql(u8, norm, "/")) {
-            name = if (std.mem.startsWith(u8, cwd, "//") and !std.mem.startsWith(u8, cwd, "///")) "//" else "/";
+        const norm = try std.fs.path.resolveAlloc(allocator, &.{cwd});
+        var name = std.fs.path.basename(norm);
+        if (name.len == 0) {
+            if (builtin.os.tag != .windows and std.mem.eql(u8, norm, "/") and std.mem.startsWith(u8, cwd, "//") and !std.mem.startsWith(u8, cwd, "///")) {
+                name = "//";
+            } else {
+                name = norm;
+            }
         }
         try out.writeAll(separator);
         try segment(out, "\x1b[93m\u{f024b}", "\x1b[1;92m");
